@@ -61,7 +61,7 @@
  ::connect-websocket
  (fn [_ _]
    {:websocket {:method :get
-                :uri "ws://bad-api-assignment.reaktor.com/rps/live"
+                :uri "wss://bad-api-assignment.reaktor.com/rps/live"
                 :on-message [::msg-handler]
                 :on-success [:websocket-success]
                 :on-failure [:websocket-failure]}}))
