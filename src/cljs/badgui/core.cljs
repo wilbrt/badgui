@@ -1,10 +1,10 @@
-(ns badup.core
+(ns badgui.core
   (:require
    [reagent.dom :as rdom]
    [re-frame.core :as re-frame]
-   [badup.events :as events]
-   [badup.views :as views]
-   [badup.config :as config]
+   [badgui.events :as events]
+   [badgui.views :as views]
+   [badgui.config :as config]
    ))
 
 
@@ -21,4 +21,6 @@
 (defn init []
   (re-frame/dispatch-sync [::events/initialize-db])
   (dev-setup)
+  (re-frame/dispatch [::events/connect-websocket])
+  (re-frame/dispatch [::events/fetch-results])
   (mount-root))
