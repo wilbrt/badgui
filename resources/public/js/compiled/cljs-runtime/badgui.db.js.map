@@ -1,0 +1,1 @@
+{"version":3,"sources":["badgui/db.cljs"],"mappings":";AAEA,uBAAA,2CAAA,qDAAA,vHAAKA","names":["badgui.db/default-db"],"sourcesContent":["(ns badgui.db)\r\n\r\n(def default-db\r\n  {:name \"re-frame\"})\r\n"]}

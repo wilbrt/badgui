@@ -7,7 +7,8 @@
             [cheshire.core :refer :all]
             [aleph.http :as http]
             [mount.core :as mount]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io])
+  (:gen-class))
 
 (defn index-handler [_]
   {:body
