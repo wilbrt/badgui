@@ -41,7 +41,7 @@
        routess))
 
 (mount/defstate server
-  :start (http/start-server #'app {:port 8080})
+  :start (http/start-server #'app {:port (Integer. (or (System/getenv "PORT") "8080"))})
   :stop (.close server))
 
 (defn -main [& _]
