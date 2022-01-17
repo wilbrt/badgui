@@ -31,12 +31,16 @@
 (defroutes resources-routes
     (route/resources "/"))
 
+(defroutes node_modules
+  (route/files "/" {:root "node_modules"}))
+
  (defroutes routess
    (GET "/" [] (index-handler "asd"))
    (route/not-found "<h1>Page not found</h1>"))
 
  (def app
    (routes
+       node_modules
        resources-routes
        routess))
 

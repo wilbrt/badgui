@@ -1,6 +1,6 @@
 (defproject badup "0.1.0-SNAPSHOT"
   :source-paths ["src" "src/clj"]
-  :resource-paths ["resources"]
+  :resource-paths ["resources" "node_modules"]
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [ring "1.9.5"]
                  [org.clojure/java.jdbc "0.6.1"]
