@@ -25,6 +25,8 @@ base_count:oe
 beforeFlush:We
 bitmap:na
 buf:Md
+buf_len:kg
+buf_pos:gg
 buffer_:Mb
 cachedOptions_:pe
 cached_hierarchy:Zc
@@ -170,6 +172,13 @@ cljs$spec$alpha$Spec$conform_STAR_$arity$2:ld
 cljs$spec$alpha$Spec$with_gen_STAR_$arity$2:md
 cljs$spec$alpha$Specize$specize_STAR_$arity$1:Yb
 cljs$spec$alpha$Specize$specize_STAR_$arity$2:Zb
+cljs$tools$reader$reader_types$IPushbackReader$unread$arity$2:lg
+cljs$tools$reader$reader_types$IndexingReader$:rg
+cljs$tools$reader$reader_types$IndexingReader$get_column_number$arity$1:og
+cljs$tools$reader$reader_types$IndexingReader$get_file_name$arity$1:pg
+cljs$tools$reader$reader_types$IndexingReader$get_line_number$arity$1:qg
+cljs$tools$reader$reader_types$Reader$peek_char$arity$1:jg
+cljs$tools$reader$reader_types$Reader$read_char$arity$1:hg
 cljsDOMValue:nd
 cljsInputDirty:ze
 cljsInputLive:Vd
@@ -291,6 +300,7 @@ prefer_table:Mf
 progressEventsEnabled_:Le
 propagationStopped_:Tc
 ratom:Ia
+rdr:mg
 re:xd
 reaction:Uc
 reagReactionCache:fe
@@ -313,6 +323,8 @@ rest:Sa
 riter:Wc
 root_iter:Re
 s:ca
+s_len:ng
+s_pos:ig
 sb:Qf
 scheduled_QMARK_:Ad
 section:eb

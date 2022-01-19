@@ -22,5 +22,4 @@
   (re-frame/dispatch-sync [::events/initialize-db])
   (dev-setup)
   (re-frame/dispatch [::events/connect-websocket])
-  (re-frame/dispatch [::events/fetch-results])
   (mount-root))

@@ -9,7 +9,7 @@
 (defn display-results [result]
   (let [a (:playerA result)
         b (:playerB result)]
-    [:tr.b {:key (int (:t result))}
+    [:div.b {:key (gensym "on-going")}
      [:td [:h3 {:on-click #(re-frame/dispatch [::events/boxit (:name a)])} (str (:name a))]
            [:p (str (:played a))]]
      [:td.versus (str " VS ")]
@@ -19,33 +19,27 @@
 (defn hoverbox [info]
   [:div
    [:h3 (str (:name info) "'s statitistics")]
-   [:p (str "Total matches played: " (:total info))]
-   [:p (str "Most played: " (str (:most-played info)))]])
+   [:p (str "Total matches played: " (:gamesplayed info))]
+   [:p (str "Winrate: " (:winrate info))]
+   [:p (str "Most played: " (str (:mostplayed info)))]])
+
 
 (defn main-panel []
-  (let [name (re-frame/subscribe [::subs/name])
-        loading (re-frame/subscribe [::subs/loading])
+  (let [loading (re-frame/subscribe [::subs/loading])
         results (re-frame/subscribe [::subs/results])
         cursor (re-frame/subscribe [::subs/cursor])
         ongoing (re-frame/subscribe [::subs/ongoing])
         box (re-frame/subscribe [::subs/box])]
     [:div {:align "center"}
-     [:h1
+     [:h1 {:align "center"}
       "Game viewer"]
-      [:button {:on-click #(re-frame/dispatch [::events/fetch-results])} "Boom"]
-      [:button {:on-click #(re-frame/dispatch [::events/fetch-next @cursor])} "Get Next Page"]
-    [:tr
-        [:td.listl
+    [:p (when @box  (hoverbox @box))]
+        [:td.head
         [:h3 {:align "center"} "Ongoing Games"]
-         [:tr [:th "Player A"]
+         [:div [:th "Player A"]
               [:th.versus " "]
               [:th "Player B"]]
-     (map #(display-results (second %)) @ongoing)]
+     (map #(display-results (second %)) @ongoing)
         [:td.box
-         [:p {:align "center"} (when @box  (hoverbox @box))]]
-     [:td.listr (when @loading "Loading...")]
-     [:h3 {:align "center"} "Game History"]
-     [:tr [:th "Player A"]
-          [:th.versus " "]
-          [:th "Player B"]]
-    (map display-results @results)]]))
+         [:p {:align "center"}]]
+     [:td.listr (when @loading "Loading...")]]]))

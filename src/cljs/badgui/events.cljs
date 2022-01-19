@@ -7,6 +7,8 @@
    [ajax.core :as ajax]
    ))
 
+
+
 (defn websocket-effect
   [{:as request
     :keys [uri on-message on-error on-success on-failure existing-websocket]}]
@@ -33,27 +35,12 @@
         (take-nth 2 s)
         ))
 
-(defn xsplayed [data name sym]
-  (count
-    (filter #(or (and (= (:played (:playerA %)) sym)
-                      (= (:name (:playerA %)) name))
-                 (and (= (:played (:playerA %)) sym)
-                      (= (:name (:playerA %)) name)))
-         data)))
-
-
 (defn filltemp [data]
       (-> temp
           (assoc :type (second data)
                  :gameId (nth data 3))
           (assoc-in [:playerA :name] (nth data 6))
           (assoc-in [:playerB :name] (nth data 9))))
-
-(defn relevantdata [data name]
-  (filter #(or (= name (:name (:playerA %)))
-               (= name (:name (:playerB %))))
-          data))
-
 
 (re-frame/reg-fx :websocket websocket-effect)
 
@@ -73,8 +60,8 @@
        (assoc :connecting true))))
 
 (re-frame/reg-event-db
-  ::update-name
-    (fn [db [_ val]]
+  ::fetch-results-succes
+    (fn [db [_ [val]]]
       (assoc db :name val)))
 
 (re-frame/reg-event-fx                             ;; note the trailing -fx
@@ -82,44 +69,38 @@
   (fn [{:keys [db]} _]                    ;; the first param will be "world"
     {:db   (assoc db :loading true)   ;; causes the twirly-waiting-dialog to show??
      :http-xhrio {:method          :get
-                  :uri             "http://localhost:8080/history"
+                  :uri             (str "http://localhost:8080/history")
                   :timeout         8000                                           ;; optional see API docs
                   :response-format (ajax/json-response-format {:keywords? true})  ;; IMPORTANT!: You must provide this.
                   :on-success      [::fetch-results-success]
                   :on-failure      [::fetch-results-failure]}}))
 
-(re-frame/reg-event-db
- ::fetch-results-success
- (fn [db [_ data]]
-   (let [d (js->clj (.parse js/JSON (:result data)) :keywordize-keys true)]
-     (-> db
-       (assoc :loading false)
-       (assoc :results (:data d))
-       (assoc :cursor  (second (.split (str (:cursor d)) "=")))))))
+(re-frame/reg-event-fx
+  ::boxit
+  (fn [{:keys [db]} [_ val]]
+    {:db (assoc db :loading true)
+     :http-xhrio {:method          :get
+                  :uri             (str "http://localhost:"
+                                        (or (. (. js/process -env) -port)
+                                            "8080")
+                                        "/box/" val)
+                  :timeout         8000
+                  :params {:msg "BOXBOXBOX"}  ;; optional see API docs
+                  :response-format (ajax/text-response-format)  ;; IMPORTANT!: You must provide this.
+                  :on-success      [::box-handler]
+                  :on-failure      [::box-handler]}}))
 
 (re-frame/reg-event-db
- ::fetch-results-failure
+ ::box-handler
  (fn [db [_ data]]
    (-> db
-      (assoc :loading false)
-      (assoc :name data))))
-
-(re-frame/reg-event-fx                             ;; note the trailing -fx
-  ::fetch-next                      ;; usage:  (dispatch [:handler-with-http])
-  (fn [_ [_ val]]                    ;; the first param will be "world"
-    {:http-xhrio {:method          :get
-                  :uri             (str "http://localhost:8080/history/" val)
-                  :timeout         8000                                           ;; optional see API docs
-                  :response-format (ajax/json-response-format {:keywords? true})  ;; IMPORTANT!: You must provide this.
-                  :on-success      [::fetch-results-success]
-                  :on-failure      [::fetch-results-failure]}}))
-
-
+       (assoc :loading false)
+       (assoc :box  (cljs.reader/read-string data)))))
 
 (re-frame/reg-event-fx
  ::msg-handler
  (fn [_ [_ message]]
-      (let [msg (parselive (.parse js/JSON (.-data message)))]
+   (let [msg (parselive (.parse js/JSON (.-data message)))]
             (if (= (second msg) "GAME_BEGIN")
                 (re-frame/dispatch [::add-ongoing msg])
                 (re-frame/dispatch [::update-handler msg])))))
@@ -128,12 +109,37 @@
  ::update-handler
  (fn [_ [_ msg]]
    {:fx [[:dispatch [::change-ongoing msg]]
+         [:dispatch [::update-backend msg]]
          [:dispatch-later {:ms 3000 :dispatch [::del-ongoing msg]}]]}))
 
 (re-frame/reg-event-db
  ::add-ongoing
     (fn [db [_ data]]
       (assoc-in db [:ongoing (keyword (nth data 3))]  (filltemp data))))
+
+(re-frame/reg-event-fx                             ;; note the trailing -fx
+  ::update-backend                      ;; usage:  (dispatch [:handler-with-http])
+  (fn [db [_ data]]                    ;; the first param will be "world"
+    {:http-xhrio {:method          :post
+                  :uri             (str "http://localhost:"
+                                        (or (. (. js/process -env) -port)
+                                            "8080") "/wsdata")
+                  :params          {:gameId (nth data 3)
+                                    :t (nth data 5)
+                                     :playerA {:name (nth data 7)
+                                               :played (nth data 9)}
+                                     :playerB {:name (nth data 12)
+                                               :played (nth data 14)}}
+                  :timeout         5000
+                  :format          (ajax/json-request-format)
+                  :response-format (ajax/json-response-format {:keywords? true})
+                  :on-success      [::success-post-result]
+                  :on-failure      [::failure-post-result]}}))
+
+(re-frame/reg-event-db
+  ::failure-post-result
+  (fn [db [_ result]]
+    (assoc db :failure-http-result result)))
 
 (re-frame/reg-event-db
  ::change-ongoing
@@ -150,23 +156,3 @@
  (fn [db [_ data]]
       (-> db
         (update-in [:ongoing] dissoc (keyword (nth data 3))))))
-
-(re-frame/reg-event-fx
- ::boxit
- (fn [{:keys [db]} [_ name]]
-   {:db (assoc db :loading true)
-    :fx [[:dispatch [::box-calc name]]]}))
-
-(re-frame/reg-event-db
- ::box-calc
-
- (fn [db [_ name]]
-  (let [rd (relevantdata (:results db) name)
-        numof {"Rock" (xsplayed rd name "ROCK")
-                "Paper" (xsplayed rd name "PAPER")
-                "Scissors" (xsplayed rd name "SCISSORS")}]
-   (-> db
-       (assoc-in [:box :total] (count rd))
-       (assoc-in [:box :name] name)
-       (assoc-in [:box :most-played]  (key (apply max-key val numof)))
-       (assoc :loading false)))))

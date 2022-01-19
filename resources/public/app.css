@@ -1,0 +1,16 @@
+
+.versus {
+  padding: 20px;
+}
+
+.b {
+  border-style: solid;
+  border-width: 2px;
+  margin: 10px;
+  width: 100%;
+}
+
+.head {
+  padding: 15px;
+  margin: 10px;
+}

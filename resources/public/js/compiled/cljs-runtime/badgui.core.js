@@ -21,8 +21,6 @@ badgui.core.dev_setup();
 
 re_frame.core.dispatch(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("badgui.events","connect-websocket","badgui.events/connect-websocket",-354299278)], null));
 
-re_frame.core.dispatch(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("badgui.events","fetch-results","badgui.events/fetch-results",-97171637)], null));
-
 return badgui.core.mount_root();
 });
 

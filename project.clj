@@ -7,6 +7,7 @@
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
                  [metosin/muuntaja "0.6.8"]
                  [compojure "1.6.2"]
+                 [ring/ring-json "0.5.1"]
                  [day8.re-frame/http-fx "0.2.3"]
                  [clj-http "3.12.3"]
                  [cheshire "5.10.1"]
@@ -16,7 +17,7 @@
   :main ^:skip-aot web.core
   :uberjar-name "badgui-standalone.jar"
   :min-lein-version "2.0.0"
-  :ring {:handler web.core/-main}
+  :ring {:handler web.core/app}
   :plugins [[lein-ring "0.12.6"]]
   :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                                   [ring-mock "0.1.5"]]}

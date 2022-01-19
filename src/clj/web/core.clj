@@ -3,30 +3,20 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [muuntaja.core :as m]
+            [clojure.java.jdbc :as sql]
             [clj-http.client :as client]
             [cheshire.core :refer :all]
             [aleph.http :as http]
             [mount.core :as mount]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [web.database :as database]
+            [ring.middleware.json :refer [wrap-json-response]]
+            [ring.util.response :refer [response]])
   (:gen-class))
 
 (defn index-handler [_]
   {:body
     (slurp (io/resource "public/index.html"))})
-
-#_(defn scrape []
- (let [initial (parse-string
-                (:body (client/get "https://bad-api-assignment.reaktor.com/rps/history"
-                                   {:accept :json}))
-                true)]
-  (loop [cursor (:cursor initial) data (:data initial) times 0]
-      (if (= cursor "/rps/history?cursor=-sz1vUtyeKGl")
-        times
-        (let [new (parse-string
-                   (:body (client/get (str "https://bad-api-assignment.reaktor.com" cursor)
-                                      {:accept :json}))
-                   true)]
-            (recur (:cursor new) (conj data (:data new)) (inc times)))))))
 
 (defroutes resources-routes
     (route/resources "/"))
@@ -36,6 +26,9 @@
 
  (defroutes routess
    (GET "/" [] (index-handler "asd"))
+   (GET "/history" [] (str "jaahas"))
+   (GET "/box/:name" [name] (str (database/box name)))
+   (POST "/wsdata" req (database/destruct (parse-string (slurp (:body req)) true)))
    (route/not-found "<h1>Page not found</h1>"))
 
  (def app
@@ -49,4 +42,5 @@
   :stop (.close server))
 
 (defn -main [& _]
-  (mount/start))
+  (mount/start)
+  (database/scrape))
