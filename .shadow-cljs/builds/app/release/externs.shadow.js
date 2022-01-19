@@ -19,6 +19,7 @@ ShadowJS.prototype.Meta;
 ShadowJS.prototype.MozPrintableKey;
 ShadowJS.prototype.NEGATIVE_INFINITY;
 ShadowJS.prototype.NaN;
+ShadowJS.prototype.PORT;
 ShadowJS.prototype.POSITIVE_INFINITY;
 ShadowJS.prototype.Profiler;
 ShadowJS.prototype.Provider;
