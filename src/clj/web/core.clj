@@ -43,5 +43,4 @@
 
 (defn -main [& _]
   (mount/start)
-  (database/create-table)
   (database/scrape))

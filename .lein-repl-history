@@ -170,3 +170,4 @@ quit
 (sql/query "postgresql://localhost:5432/badgui" ["select * from pelit"])
 (sql/query "postgresql://localhost:5432/badgui" ["select * from asd"])
 (= nil (sql/query "postgresql://localhost:5432/badgui" ["select * from asd"]))
+(create-table)

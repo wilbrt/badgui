@@ -43,7 +43,8 @@
   (loop [eka (scrapepage "/rps/history")]
     (do
       (doall (map destruct (:data eka)))
-      (if (not (= () (sql/query spec ["select * from pelit where cursor = ?" (:cursor eka)])))
+      (if (or (not (= () (sql/query spec ["select * from pelit where cursor = ?" (:cursor eka)])))
+              (= (:cursor eka) "/rps/history?cursor=-sz1vUtyeKGl"))
           "Up to date"
           (do (sql/insert! spec :pelit {:cursor (:cursor eka) :gameId (str (gensym "cursor"))})
               (recur (scrapepage (:cursor eka))))))))
