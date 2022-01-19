@@ -80,7 +80,7 @@
   (fn [{:keys [db]} [_ val]]
     {:db (assoc db :loading true)
      :http-xhrio {:method          :get
-                  :uri             (str "http://localhost:"
+                  :uri             (str "0.0.0.0:"
                                         (or (. (. js/process -env) -PORT)
                                             "8080")
                                         "/box/" val)
@@ -121,7 +121,7 @@
   ::update-backend                      ;; usage:  (dispatch [:handler-with-http])
   (fn [db [_ data]]                    ;; the first param will be "world"
     {:http-xhrio {:method          :post
-                  :uri             (str "http://localhost:"
+                  :uri             (str "0.0.0.0:"
                                         (or (. (. js/process -env) -PORT)
                                             "8080") "/wsdata")
                   :params          {:gameId (nth data 3)
