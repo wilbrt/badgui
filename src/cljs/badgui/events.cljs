@@ -80,10 +80,7 @@
   (fn [{:keys [db]} [_ val]]
     {:db (assoc db :loading true)
      :http-xhrio {:method          :get
-                  :uri             (str "0.0.0.0:"
-                                        (or (. (. js/process -env) -PORT)
-                                            "8080")
-                                        "/box/" val)
+                  :uri             (str "./box/" val)
                   :timeout         8000
                   :params {:msg "BOXBOXBOX"}  ;; optional see API docs
                   :response-format (ajax/text-response-format)  ;; IMPORTANT!: You must provide this.
@@ -121,9 +118,9 @@
   ::update-backend                      ;; usage:  (dispatch [:handler-with-http])
   (fn [db [_ data]]                    ;; the first param will be "world"
     {:http-xhrio {:method          :post
-                  :uri             (str "0.0.0.0:"
-                                        (or (. (. js/process -env) -PORT)
-                                            "8080") "/wsdata")
+                  :uri             (str "./wsdata"
+                                        #_(or (. (. js/process -env) -port)
+                                            "8080"))
                   :params          {:gameId (nth data 3)
                                     :t (nth data 5)
                                      :playerA {:name (nth data 7)

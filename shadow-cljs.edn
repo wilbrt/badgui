@@ -26,4 +26,11 @@
    :devtools
    {:preloads []}
    :dev
-   {}}}}
+   {}}
+   :script
+   {:target :node-script
+    :main badgui.core/init
+    :output-to "resources/public/js/compiled/app.js"
+    :js-options
+    {:js-provider :shadow
+      :keep-native-requires true}}}}
