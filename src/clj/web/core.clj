@@ -31,9 +31,6 @@
    (POST "/wsdata" req (database/destruct (parse-string (slurp (:body req)) true)))
    (route/not-found "<h1>Page not found</h1>"))
 
-(defn dbinit []
-  (if ()))
-
  (def app
    (routes
        node_modules
