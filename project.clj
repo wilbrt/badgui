@@ -1,4 +1,4 @@
-(defproject badup "0.1.0-SNAPSHOT"
+(defproject badgui "0.1.0-SNAPSHOT"
   :source-paths ["src" "src/clj"]
   :resource-paths ["resources"]
   :dependencies [[org.clojure/clojure "1.8.0"]
