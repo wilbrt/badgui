@@ -90,9 +90,20 @@
 (re-frame/reg-event-db
  ::box-handler
  (fn [db [_ data]]
-   (-> db
+   (let [handled (cljs.reader/read-string data)]
+      (-> db
+       (assoc-in [:box :show] true)
+       (dissoc :searchf)
        (assoc :loading false)
-       (assoc :box  (cljs.reader/read-string data)))))
+       (assoc :box  (dissoc handled :results))
+       (assoc :history (:results handled))
+       (assoc :pagenum {:max (count (partition 5 (:results handled)))
+                        :now 0})))))
+
+(re-frame/reg-event-db
+ ::del-box
+ (fn [db _]
+   (assoc-in db [:box :show] false)))
 
 (re-frame/reg-event-fx
  ::msg-handler
@@ -153,3 +164,14 @@
  (fn [db [_ data]]
       (-> db
         (update-in [:ongoing] dissoc (keyword (nth data 3))))))
+
+
+(re-frame/reg-event-db
+  ::update-search
+   (fn [db [_ value]]
+     (assoc db :searchf value)))
+
+(re-frame/reg-event-db
+ ::pagenumber
+ (fn [db [_ value]]
+   (update-in db [:pagenum :now] + value)))

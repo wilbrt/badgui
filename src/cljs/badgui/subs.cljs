@@ -18,11 +18,6 @@
    (:results  db)))
 
 (re-frame/reg-sub
- ::cursor
- (fn [db]
-   (:cursor db)))
-
-(re-frame/reg-sub
  ::ongoing
  (fn [db]
    (:ongoing db)))
@@ -31,3 +26,18 @@
  ::box
  (fn [db]
    (:box db)))
+
+(re-frame/reg-sub
+ ::history
+ (fn [db]
+   (:history db)))
+
+(re-frame/reg-sub
+  ::searchf
+  (fn [db]
+    (:searchf db)))
+
+(re-frame/reg-sub
+ ::pagenum
+ (fn [db]
+   (:pagenum db)))

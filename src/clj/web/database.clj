@@ -50,17 +50,17 @@
               (recur (scrapepage (:cursor eka))))))))
 
 (defn gamesPlayed [name]
-  (+ (count (sql/query spec ["select * from pelit where namea = ?" name]))
-     (count (sql/query spec ["select * from pelit where nameb = ?" name]))))
+  (sql/query spec ["select * from pelit where namea = ? or nameb = ?"
+                             name name]))
 
 (defn getWinrate [name]
-     (/ (count (sql/query spec ["select * from pelit where winner = ?"  name]))
-     (gamesPlayed name)))
+     (format "%.2f" (/ (* 100.0 (count (sql/query spec ["select * from pelit where winner = ?"  name])))
+                                (count (gamesPlayed name)))))
 
 (defn xsplayed [name x]
   (count (sql/query spec
-                                ["select * from pelit where (namea = ? and playa = ?) or (nameb = ? and playb = ?) "
-                                 name x name x])))
+            ["select * from pelit where (namea = ? and playa = ?) or (nameb = ? and playb = ?) "
+              name x name x])))
 
 (defn mostPlayed [name]
   (apply max-key val {"ROCK" (xsplayed name "ROCK")
@@ -71,7 +71,11 @@
   (destruct (:data req)))
 
 (defn box [name]
-  {:name name
-   :gamesplayed (str (gamesPlayed name))
-   :winrate (str (* 0.01 (Math/round (* 10000.0 (getWinrate name)))) "%")
-   :mostplayed (first (mostPlayed name))})
+  (let [matches (gamesPlayed name)
+        ratio (getWinrate name)]
+    {:name name
+      :results (map str matches)
+      :gamesplayed (str (count matches))
+      :winrate (str
+                (getWinrate name) "%")
+      :mostplayed (first (mostPlayed name))}))
