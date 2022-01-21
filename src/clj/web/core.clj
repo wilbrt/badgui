@@ -26,7 +26,6 @@
 
  (defroutes routess
    (GET "/" [] (index-handler "asd"))
-   (GET "/history" [] (str "jaahas"))
    (GET "/box/:name" [name] (str (database/box name)))
    (POST "/wsdata" req (database/destruct (parse-string (slurp (:body req)) true)))
    (route/not-found "<h1>Page not found</h1>"))

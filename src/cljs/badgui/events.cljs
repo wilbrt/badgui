@@ -133,7 +133,6 @@
                                         #_(or (. (. js/process -env) -port)
                                             "8080"))
                   :params          {:gameId (nth data 3)
-                                    :t (nth data 5)
                                      :playerA {:name (nth data 7)
                                                :played (nth data 9)}
                                      :playerB {:name (nth data 12)
