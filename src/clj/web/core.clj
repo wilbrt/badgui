@@ -45,5 +45,5 @@
   (if (= "First" (first args))
     (database/create-table))
   (database/scrape (if (second args)
-                        (second args)
+                        (Integer/parseInt (second args))
                         -1)))
