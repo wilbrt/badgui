@@ -3,8 +3,7 @@
               [clj-http.client :as client]
               [cheshire.core :refer :all]))
 
-(def spec (or (System/getenv "DATABASE_URL")
-              "postgresql://localhost:5432/badgui"))
+(def spec "postgresql://localhost:5432/badgui")
 
 
 (defn winner [a b]
@@ -39,15 +38,16 @@
              (:body (client/get (str "https://bad-api-assignment.reaktor.com" cursor)
                                 {:accept :json})) true))
 
-(defn scrape []
-  (loop [eka (scrapepage "/rps/history")]
+(defn scrape [num]
+  (loop [eka (scrapepage "/rps/history") n num]
     (do
       (doall (map destruct (:data eka)))
       (if (or (not (= () (sql/query spec ["select * from pelit where cursor = ?" (:cursor eka)])))
-              (= (:cursor eka) "/rps/history?cursor=-sz1vUtyeKGl"))
+              (= (:cursor eka) "/rps/history?cursor=-sz1vUtyeKGl")
+              (= n 0))
           "Up to date"
           (do (sql/insert! spec :pelit {:cursor (:cursor eka) :gameId (str (gensym "cursor"))})
-              (recur (scrapepage (:cursor eka))))))))
+              (recur (scrapepage (:cursor eka)) (dec n)))))))
 
 (defn gamesPlayed [name]
   (sql/query spec ["select * from pelit where namea = ? or nameb = ?"

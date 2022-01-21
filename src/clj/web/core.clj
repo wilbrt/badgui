@@ -41,6 +41,10 @@
   :start (http/start-server #'app {:port (Integer. (or (System/getenv "PORT") "8080"))})
   :stop (.close server))
 
-(defn -main [& _]
+(defn -main [& args]
   (mount/start)
-  (database/scrape))
+  (if (= "First" (first args))
+    (database/create-table))
+  (database/scrape (if (second args)
+                        (second args)
+                        -1)))
