@@ -50,8 +50,8 @@
    {:websocket {:method :get
                 :uri "wss://bad-api-assignment.reaktor.com/rps/live"
                 :on-message [::msg-handler]
-                :on-success [:websocket-success]
-                :on-failure [:websocket-failure]}}))
+                :on-success [:success]
+                :on-failure [:failure-result]}}))
 
 (re-frame/reg-event-db
  ::initialize-db
@@ -60,18 +60,18 @@
        (assoc :connecting true))))
 
 (re-frame/reg-event-db
-  ::fetch-results-succes
+  ::success
     (fn [db [_ [val]]]
-      (assoc db :name val)))
+      (assoc db :status val)))
 
-(re-frame/reg-event-fx                             ;; note the trailing -fx
-  ::update-server                     ;; usage:  (dispatch [:handler-with-http])
-  (fn [{:keys [db]} _]                    ;; the first param will be "world"
+(re-frame/reg-event-fx
+  ::update-server
+  (fn [{:keys [db]} _]
     {:http-xhrio {:method          :get
-                  :uri             (str "./update")
-                  :timeout         8000                                           ;; optional see API docs
-                  :response-format (ajax/json-response-format {:keywords? true})  ;; IMPORTANT!: You must provide this.
-                  :on-success      [::fetch-results-success]
+                  :uri             "./update"
+                  :timeout         8000
+                  :response-format (ajax/json-response-format {:keywords? true})
+                  :on-success      [::success]
                   :on-failure      [::fetch-results-failure]}}))
 
 (re-frame/reg-event-fx
@@ -81,10 +81,10 @@
      :http-xhrio {:method          :get
                   :uri             (str "./box/" val)
                   :timeout         8000
-                  :params {:msg "BOXBOXBOX"}  ;; optional see API docs
-                  :response-format (ajax/text-response-format)  ;; IMPORTANT!: You must provide this.
+                  :params {:msg "BOXBOXBOX"}
+                  :response-format (ajax/text-response-format)
                   :on-success      [::box-handler]
-                  :on-failure      [::box-handler]}}))
+                  :on-failure      [::failure-result]}}))
 
 (re-frame/reg-event-db
  ::box-handler
@@ -124,9 +124,9 @@
     (fn [db [_ data]]
       (assoc-in db [:ongoing (keyword (nth data 3))]  (filltemp data))))
 
-(re-frame/reg-event-fx                             ;; note the trailing -fx
-  ::update-backend                      ;; usage:  (dispatch [:handler-with-http])
-  (fn [db [_ data]]                    ;; the first param will be "world"
+(re-frame/reg-event-fx
+  ::update-backend
+  (fn [db [_ data]]
     {:http-xhrio {:method          :post
                   :uri             "./wsdata"
                   :params          {:gameId (nth data 3)
@@ -138,10 +138,10 @@
                   :format          (ajax/json-request-format)
                   :response-format (ajax/json-response-format {:keywords? true})
                   :on-success      [::success-post-result]
-                  :on-failure      [::failure-post-result]}}))
+                  :on-failure      [::failure-result]}}))
 
 (re-frame/reg-event-db
-  ::failure-post-result
+  ::failure-result
   (fn [db [_ result]]
     (assoc db :failure-http-result result)))
 

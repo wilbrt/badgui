@@ -5,7 +5,6 @@
 
 (def spec "postgresql://localhost:5432/badgui")
 
-
 (defn winner [a b]
  (let [j (compare (:played a) (:played b))]
   (if (= j 0) "DRAW")
@@ -23,7 +22,8 @@
                        :nameB (:name (:playerB row))
                        :playA (:played (:playerA row))
                        :playB (:played (:playerB row))
-                       :winner (winner (:playerA row) (:playerB row))})))
+                       :winner (winner (:playerA row) (:playerB row))})
+       "GameId already exists"))
 
 (defn create-table []
    (sql/db-do-commands

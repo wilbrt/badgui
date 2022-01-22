@@ -18,13 +18,17 @@
   {:body
     (slurp (io/resource "public/index.html"))})
 
+(defn update []
+  (do (future (database/scrape -1))
+      "Message received"))
+
 (defroutes resources-routes
     (route/resources "/"))
 
  (defroutes routess
    (GET "/" [] (index-handler "asd"))
    (GET "/box/:name" [name] (str (database/box name)))
-   (GET "/update" [] (database/scrape -1))
+   (GET "/update" [] (update))
    (POST "/wsdata" req (database/destruct (parse-string (slurp (:body req)) true)))
    (route/not-found "<h1>Page not found</h1>"))
 
@@ -41,6 +45,6 @@
   (mount/start)
   (if (= "First" (first args))
     (database/create-table))
-  (database/scrape (if (second args)
+  (future (database/scrape (if (second args)
                         (Integer/parseInt (second args))
-                        -1)))
+                        -1))))

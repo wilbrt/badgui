@@ -6,7 +6,7 @@
 
 (defn hoverbox [info]
   [:div.box.right
-   [:h3 (str (:name info) "'s statitistics")]
+   [:h3 (str (:name info) "'s statistics")]
    [:p (str "Total matches played: " (:gamesplayed info))]
    [:p (str "Winrate: " (:winrate info))]
    [:p (str "Most played: " (str (:mostplayed info)))]])
