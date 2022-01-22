@@ -21,23 +21,20 @@
 (defroutes resources-routes
     (route/resources "/"))
 
-(defroutes node_modules
-  (route/files "/" {:root "node_modules"}))
-
  (defroutes routess
    (GET "/" [] (index-handler "asd"))
    (GET "/box/:name" [name] (str (database/box name)))
+   (GET "/update" [] (database/scrape -1))
    (POST "/wsdata" req (database/destruct (parse-string (slurp (:body req)) true)))
    (route/not-found "<h1>Page not found</h1>"))
 
  (def app
    (routes
-       node_modules
        resources-routes
        routess))
 
 (mount/defstate server
-  :start (http/start-server #'app {:port (Integer. (or (System/getenv "PORT") "8080"))})
+  :start (http/start-server #'app {:port 8080})
   :stop (.close server))
 
 (defn -main [& args]

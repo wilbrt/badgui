@@ -33,7 +33,7 @@
 
 (defn history-list [num]
  (let [history (re-frame/subscribe [::subs/history])]
-  (map display-history (nth (partition 5 @history) num))))
+  (map display-history (nth (partition 5 5 nil @history) num))))
 
 (defn search-field []
   (let [value (re-frame/subscribe [::subs/searchf])]
@@ -48,7 +48,7 @@
     [:div (when (> (:now @num) 0)
       [:button.marg
         {:on-click #(re-frame/dispatch [::events/pagenumber -1])} "<<"])
-    (when (< (:now @num) (inc (:max @num)))
+    (when (<= (:now @num) (:max @num))
       [:button.marg
         {:on-click #(re-frame/dispatch [::events/pagenumber 1])} ">>"])]))
 

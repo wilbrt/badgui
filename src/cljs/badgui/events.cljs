@@ -65,11 +65,10 @@
       (assoc db :name val)))
 
 (re-frame/reg-event-fx                             ;; note the trailing -fx
-  ::fetch-results                      ;; usage:  (dispatch [:handler-with-http])
+  ::update-server                     ;; usage:  (dispatch [:handler-with-http])
   (fn [{:keys [db]} _]                    ;; the first param will be "world"
-    {:db   (assoc db :loading true)   ;; causes the twirly-waiting-dialog to show??
-     :http-xhrio {:method          :get
-                  :uri             (str "http://localhost:8080/history")
+    {:http-xhrio {:method          :get
+                  :uri             (str "./update")
                   :timeout         8000                                           ;; optional see API docs
                   :response-format (ajax/json-response-format {:keywords? true})  ;; IMPORTANT!: You must provide this.
                   :on-success      [::fetch-results-success]
@@ -97,7 +96,7 @@
        (assoc :loading false)
        (assoc :box  (dissoc handled :results))
        (assoc :history (:results handled))
-       (assoc :pagenum {:max (count (partition 5 (:results handled)))
+       (assoc :pagenum {:max (dec (count (partition 5 (:results handled))))
                         :now 0})))))
 
 (re-frame/reg-event-db
@@ -129,9 +128,7 @@
   ::update-backend                      ;; usage:  (dispatch [:handler-with-http])
   (fn [db [_ data]]                    ;; the first param will be "world"
     {:http-xhrio {:method          :post
-                  :uri             (str "./wsdata"
-                                        #_(or (. (. js/process -env) -port)
-                                            "8080"))
+                  :uri             "./wsdata"
                   :params          {:gameId (nth data 3)
                                      :playerA {:name (nth data 7)
                                                :played (nth data 9)}
