@@ -18,7 +18,7 @@
   {:body
     (slurp (io/resource "public/index.html"))})
 
-(defn update []
+(defn update-handle []
   (do (future (database/scrape -1))
       "Message received"))
 
@@ -28,7 +28,7 @@
  (defroutes routess
    (GET "/" [] (index-handler "asd"))
    (GET "/box/:name" [name] (str (database/box name)))
-   (GET "/update" [] (update))
+   (GET "/update" [] (update-handle))
    (POST "/wsdata" req (database/destruct (parse-string (slurp (:body req)) true)))
    (route/not-found "<h1>Page not found</h1>"))
 
